@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buy Low, Sell High</title>
+<style>
+  :root {
+    --bg: #0e1420;
+    --panel: #172033;
+    --panel-2: #1f2b45;
+    --text: #e8edf7;
+    --muted: #8b98b5;
+    --green: #2ecc71;
+    --red: #ff5c5c;
+    --accent: #4da3ff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    gap: 24px;
+    padding: 24px;
+  }
+  main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; }
+  aside {
+    width: 300px;
+    background: var(--panel);
+    border-radius: 16px;
+    padding: 24px;
+    align-self: flex-start;
+    display: none;
+  }
+  aside.open { display: block; }
+  h1 { margin: 0 0 8px; font-size: 3rem; text-align: center; }
+  h2 { margin: 0 0 16px; font-size: 1.3rem; }
+  p.rules { color: var(--muted); font-size: 1.15rem; margin: 0 0 32px; text-align: center; max-width: 520px; }
+  .screen { display: none; width: 100%; max-width: 640px; flex-direction: column; align-items: center; }
+  .screen.active { display: flex; }
+
+  input[type=text] {
+    width: 100%;
+    max-width: 320px;
+    font-size: 1.4rem;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 2px solid var(--panel-2);
+    background: var(--panel);
+    color: var(--text);
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  input[type=text]:focus { outline: none; border-color: var(--accent); }
+
+  button {
+    font: inherit;
+    font-weight: 800;
+    letter-spacing: .05em;
+    border: 0;
+    border-radius: 14px;
+    cursor: pointer;
+    color: #fff;
+    transition: transform .08s, opacity .15s;
+  }
+  button:active:not(:disabled) { transform: scale(.97); }
+  button:disabled { opacity: .3; cursor: not-allowed; }
+  .big { font-size: 1.8rem; padding: 18px 56px; background: var(--accent); }
+  #buyBtn, #sellBtn { flex: 1; font-size: 2rem; padding: 22px 0; }
+  #buyBtn { background: var(--green); }
+  #sellBtn { background: var(--red); }
+
+  .hud { display: flex; justify-content: space-between; align-items: baseline; width: 100%; margin-bottom: 8px; }
+  #playerName { font-size: 1.4rem; font-weight: 700; overflow-wrap: anywhere; }
+  #timer { font-size: 2.4rem; font-variant-numeric: tabular-nums; font-weight: 800; }
+  #timer.low { color: var(--red); }
+  #price { font-size: 4.5rem; font-weight: 800; font-variant-numeric: tabular-nums; margin: 4px 0; }
+  #price.up { color: var(--green); }
+  #price.down { color: var(--red); }
+  canvas { width: 100%; height: 220px; background: var(--panel); border-radius: 16px; margin-bottom: 16px; }
+  .trade-row { display: flex; gap: 16px; width: 100%; margin-bottom: 16px; }
+  .locks { display: flex; gap: 32px; color: var(--muted); font-size: 1.1rem; min-height: 1.6em; }
+  .locks b { color: var(--text); }
+
+  #resultName { font-size: 1.6rem; color: var(--muted); margin-bottom: 4px; overflow-wrap: anywhere; text-align: center; }
+  #resultProfit { font-size: 5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+  #resultProfit.pos { color: var(--green); }
+  #resultProfit.neg { color: var(--red); }
+  #resultMsg { font-size: 1.6rem; margin: 8px 0 32px; text-align: center; }
+
+  ol { margin: 0; padding: 0; list-style: none; }
+  li {
+    display: flex; justify-content: space-between; gap: 12px;
+    padding: 10px 12px; border-radius: 10px; background: var(--panel-2); margin-bottom: 8px;
+    font-size: 1.1rem;
+  }
+  li .rank { color: var(--muted); width: 1.5em; }
+  li .who { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  li .val { font-variant-numeric: tabular-nums; font-weight: 700; }
+  li.empty { color: var(--muted); justify-content: center; background: transparent; }
+  .pos { color: var(--green); }
+  .neg { color: var(--red); }
+
+  @media (max-width: 800px) {
+    body { flex-direction: column-reverse; }
+    aside { width: 100%; align-self: stretch; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <!-- Start screen -->
+  <section id="startScreen" class="screen active">
+    <h1>Buy Low, Sell High</h1>
+    <p class="rules">You have 30 seconds. Press BUY once, then SELL once. Make the biggest profit.</p>
+    <input id="nameInput" type="text" maxlength="12" placeholder="Your name" autocomplete="off" autofocus>
+    <button id="startBtn" class="big" disabled>START</button>
+  </section>
+
+  <!-- Game screen -->
+  <section id="gameScreen" class="screen">
+    <div class="hud">
+      <div id="playerName"></div>
+      <div id="timer">30</div>
+    </div>
+    <div id="price">100.00</div>
+    <canvas id="chart" width="640" height="220"></canvas>
+    <div class="trade-row">
+      <button id="buyBtn">BUY</button>
+      <button id="sellBtn" disabled>SELL</button>
+    </div>
+    <div class="locks">
+      <span>Bought at: <b id="buyLock">—</b></span>
+      <span>Sold at: <b id="sellLock">—</b></span>
+    </div>
+  </section>
+
+  <!-- End screen -->
+  <section id="endScreen" class="screen">
+    <div id="resultName"></div>
+    <div id="resultProfit"></div>
+    <div id="resultMsg"></div>
+    <button id="nextBtn" class="big">NEXT PLAYER</button>
+  </section>
+</main>
+
+<aside id="boardPanel">
+  <h2>🏆 Leaderboard</h2>
+  <ol id="board"></ol>
+</aside>
+
+<script>
+(() => {
+  const ROUND_MS = 30000;
+  const TICK_MS = 100;
+  const START_PRICE = 100;
+  const STORAGE_KEY = "ecss-leaderboard";
+
+  const $ = id => document.getElementById(id);
+  const screens = { start: $("startScreen"), game: $("gameScreen"), end: $("endScreen") };
+  const nameInput = $("nameInput"), startBtn = $("startBtn");
+  const buyBtn = $("buyBtn"), sellBtn = $("sellBtn");
+  const priceEl = $("price"), timerEl = $("timer");
+  const canvas = $("chart"), ctx = canvas.getContext("2d");
+
+  let leaderboard = load();   // [{name, profit}], sorted desc, max 5
+  let game = null;            // active round state
+  let intervalId = null;
+
+  function load() {
+    try {
+      const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (Array.isArray(data)) return data.filter(e => typeof e.name === "string" && Number.isFinite(e.profit));
+    } catch (e) {}
+    return [];
+  }
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(leaderboard)); } catch (e) {}
+  }
+
+  const fmt = n => n.toFixed(2);
+  const fmtProfit = n => (n > 0 ? "+" : n < 0 ? "−" : "") + "$" + fmt(Math.abs(n));
+
+  function show(name) {
+    for (const [k, el] of Object.entries(screens)) el.classList.toggle("active", k === name);
+  }
+
+  function renderBoard() {
+    const ol = $("board");
+    ol.textContent = "";
+    if (!leaderboard.length) {
+      const li = document.createElement("li");
+      li.className = "empty";
+      li.textContent = "No scores yet";
+      ol.appendChild(li);
+      return;
+    }
+    leaderboard.forEach((e, i) => {
+      const li = document.createElement("li");
+      const rank = document.createElement("span"); rank.className = "rank"; rank.textContent = i + 1;
+      const who = document.createElement("span"); who.className = "who"; who.textContent = e.name;
+      const val = document.createElement("span");
+      val.className = "val " + (e.profit > 0 ? "pos" : e.profit < 0 ? "neg" : "");
+      val.textContent = fmtProfit(e.profit);
+      li.append(rank, who, val);
+      ol.appendChild(li);
+    });
+  }
+
+  function addScore(name, profit) {
+    leaderboard.push({ name, profit });
+    // Array.prototype.sort is stable, so earlier players win ties
+    leaderboard.sort((a, b) => b.profit - a.profit);
+    leaderboard = leaderboard.slice(0, 5);
+    save();
+    renderBoard();
+  }
+
+  function nextPrice(p) {
+    // random walk with slight mean reversion so it stays in a playable range
+    const drift = (START_PRICE - p) * 0.004;
+    const shock = (Math.random() - 0.5) * 3.2;
+    return Math.max(1, p + drift + shock);
+  }
+
+  function drawChart() {
+    const w = canvas.width, h = canvas.height, pts = game.history;
+    ctx.clearRect(0, 0, w, h);
+    const min = Math.min(...pts), max = Math.max(...pts);
+    const pad = 16, span = Math.max(max - min, 1);
+    const x = i => pad + (i / (ROUND_MS / TICK_MS)) * (w - 2 * pad);
+    const y = v => h - pad - ((v - min) / span) * (h - 2 * pad);
+
+    ctx.lineWidth = 3;
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "#4da3ff";
+    ctx.beginPath();
+    pts.forEach((v, i) => (i ? ctx.lineTo(x(i), y(v)) : ctx.moveTo(x(i), y(v))));
+    ctx.stroke();
+
+    const mark = (price, color) => {
+      const idx = pts.indexOf(price);
+      if (idx < 0) return;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(x(idx), y(price), 7, 0, Math.PI * 2);
+      ctx.fill();
+    };
+    if (game.buyPrice !== null) mark(game.buyPrice, "#2ecc71");
+    if (game.sellPrice !== null) mark(game.sellPrice, "#ff5c5c");
+  }
+
+  function startGame() {
+    const name = nameInput.value.trim();
+    if (!name) return;
+    game = {
+      name,
+      price: START_PRICE,
+      history: [START_PRICE],
+      buyPrice: null,
+      sellPrice: null,
+      endsAt: Date.now() + ROUND_MS,
+    };
+    $("playerName").textContent = name;
+    $("buyLock").textContent = "—";
+    $("sellLock").textContent = "—";
+    buyBtn.disabled = false;
+    sellBtn.disabled = true;
+    priceEl.className = "";
+    show("game");
+    render();
+    intervalId = setInterval(tick, TICK_MS);
+  }
+
+  function tick() {
+    const remaining = game.endsAt - Date.now();
+    if (remaining <= 0) return endGame();
+    const prev = game.price;
+    game.price = nextPrice(prev);
+    game.history.push(game.price);
+    priceEl.className = game.price >= prev ? "up" : "down";
+    render(remaining);
+  }
+
+  function render(remaining = ROUND_MS) {
+    const secs = Math.ceil(remaining / 1000);
+    timerEl.textContent = secs;
+    timerEl.classList.toggle("low", secs <= 5);
+    priceEl.textContent = "$" + fmt(game.price);
+    drawChart();
+  }
+
+  function buy() {
+    if (!game || game.buyPrice !== null) return;
+    game.buyPrice = game.price;
+    $("buyLock").textContent = "$" + fmt(game.buyPrice);
+    buyBtn.disabled = true;
+    sellBtn.disabled = false;
+  }
+
+  function sell() {
+    if (!game || game.buyPrice === null || game.sellPrice !== null) return;
+    game.sellPrice = game.price;
+    endGame();
+  }
+
+  function endGame() {
+    clearInterval(intervalId);
+    intervalId = null;
+    // Auto-sell at the final price if the player bought but never sold
+    if (game.buyPrice !== null && game.sellPrice === null) game.sellPrice = game.price;
+    $("sellLock").textContent = game.sellPrice !== null ? "$" + fmt(game.sellPrice) : "—";
+    buyBtn.disabled = sellBtn.disabled = true;
+    drawChart();
+
+    const traded = game.buyPrice !== null;
+    // Round to cents so displayed values, sorting and messages agree
+    const profit = traded ? Math.round((game.sellPrice - game.buyPrice) * 100) / 100 : 0;
+
+    let msg;
+    if (!traded) msg = "No trade. Playing it safe!";
+    else if (profit > 0) msg = "Nice trade!";
+    else if (profit < 0) msg = "Ouch, you bought the top";
+    else msg = "Break even";
+
+    $("resultName").textContent = game.name;
+    const pe = $("resultProfit");
+    pe.textContent = fmtProfit(profit);
+    pe.className = profit > 0 ? "pos" : profit < 0 ? "neg" : "";
+    $("resultMsg").textContent = msg;
+
+    addScore(game.name, profit);
+    game = null;
+    // Brief pause so the player sees the locked sell price before the result appears
+    setTimeout(() => { if (!game) show("end"); $("nextBtn").focus(); }, 600);
+  }
+
+  function nextPlayer() {
+    nameInput.value = "";
+    startBtn.disabled = true;
+    show("start");
+    nameInput.focus();
+  }
+
+  nameInput.addEventListener("input", () => { startBtn.disabled = !nameInput.value.trim(); });
+  nameInput.addEventListener("keydown", e => { if (e.key === "Enter") startGame(); });
+  startBtn.addEventListener("click", startGame);
+  buyBtn.addEventListener("click", buy);
+  sellBtn.addEventListener("click", sell);
+  $("nextBtn").addEventListener("click", nextPlayer);
+
+  // Ctrl+Shift+F12 (with Fn on laptops) toggles the leaderboard panel
+  document.addEventListener("keydown", e => {
+    if (e.ctrlKey && e.shiftKey && e.key === "F12") {
+      e.preventDefault();
+      $("boardPanel").classList.toggle("open");
+    }
+  });
+
+  renderBoard();
+  nameInput.focus();
+})();
+</script>
+</body>
+</html>
