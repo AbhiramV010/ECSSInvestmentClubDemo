@@ -4,168 +4,234 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Buy Low, Sell High</title>
+<link rel="icon" type="image/png" href="img.png">
 <style>
+  @font-face {
+    font-family: "Roboto Slab";
+    src: url("fonts/roboto-slab-latin-wght.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
   :root {
-    --bg: #f5f6f8;
-    --paper: #ffffff;
-    --ink: #14181f;
-    --muted: #5b6472;
-    --line: #14181f;
-    --blue: #1d4ed8;
-    --green: #15803d;
-    --red: #c81e1e;
+    --desktop: #008080;
+    --face: #c0c0c0;
+    --navy: #000080;
+    --sky: #1084d0;
+    --green: #0a7a0a;
+    --red: #c00000;
+    --screen: #000;
+    --led-up: #3dff3d;
+    --led-down: #ff4d4d;
+    /* Win98 bevels */
+    --raised: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf;
+    --pressed: inset -1px -1px #fff, inset 1px 1px #000, inset -2px -2px #dfdfdf, inset 2px 2px #808080;
+    --sunken: inset -1px -1px #fff, inset 1px 1px #808080, inset -2px -2px #dfdfdf, inset 2px 2px #000;
   }
   * { box-sizing: border-box; }
   body {
     margin: 0;
     min-height: 100vh;
-    background: var(--bg);
-    color: var(--ink);
-    font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    background: var(--desktop);
+    color: #000;
+    font-family: "Roboto Slab", Georgia, "Times New Roman", serif;
     display: flex;
     flex-direction: column;
   }
+
+  /* Main blue title bar */
   header {
-    display: flex; align-items: center; gap: 14px;
-    background: var(--blue);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
+    background: linear-gradient(90deg, var(--navy), var(--sky));
     color: #fff;
-    padding: 10px 24px;
-    border-bottom: 4px solid var(--ink);
+    padding: 6px 12px;
+    border-bottom: 2px solid #000;
   }
-  header img { width: 44px; height: 44px; display: block; border: 2px solid #fff; }
-  header span { font-size: 1.2rem; font-weight: 700; letter-spacing: .02em; }
-  .layout { flex: 1; display: flex; gap: 24px; padding: 24px; }
-  main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; }
-  aside {
-    width: 300px;
-    background: var(--paper);
-    border: 2px solid var(--line);
-    border-top: 8px solid var(--blue);
-    padding: 20px;
-    align-self: flex-start;
-    display: none;
+  header img { height: 76px; width: auto; display: block; background: #fff; padding: 3px 8px; box-shadow: var(--sunken); justify-self: start; }
+  header h1.brand {
+    margin: 0;
+    font-size: 2.6rem;
+    font-weight: 800;
+    letter-spacing: .03em;
+    text-align: center;
+    text-shadow: 2px 2px 0 #000;
   }
-  aside.open { display: block; }
-  h1 { margin: 0 0 8px; font-size: 3rem; text-align: center; }
-  h2 { margin: 0 0 16px; font-size: 1.2rem; text-transform: uppercase; letter-spacing: .08em; }
-  p.rules { color: var(--muted); font-size: 1.15rem; margin: 0 0 32px; text-align: center; max-width: 520px; }
-  .screen { display: none; width: 100%; max-width: 640px; flex-direction: column; align-items: center; }
+  .ctl { display: flex; gap: 2px; justify-self: end; }
+  .ctl span {
+    width: 26px; height: 24px;
+    display: grid; place-items: center;
+    background: var(--face); color: #000;
+    box-shadow: var(--raised);
+    font-size: 14px; font-weight: 800; line-height: 1;
+  }
+
+  .layout { flex: 1; display: flex; gap: 24px; padding: 16px 24px; align-items: flex-start; }
+  main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; align-self: stretch; }
+
+  /* Windows */
+  .win { background: var(--face); box-shadow: var(--raised), 4px 4px 0 rgba(0,0,0,.45); padding: 3px; }
+  main .win { width: min(680px, 100%); }
+  aside.win { width: 300px; display: none; }
+  aside.win.open { display: block; }
+  .titlebar {
+    display: flex; justify-content: space-between; align-items: center;
+    background: linear-gradient(90deg, var(--navy), var(--sky));
+    color: #fff;
+    padding: 3px 4px 3px 8px;
+    font-weight: 700;
+    font-size: .95rem;
+  }
+  .titlebar .ctl span { width: 20px; height: 18px; font-size: 11px; }
+  .win-body { padding: 12px 16px; }
+  .screen { display: none; flex-direction: column; align-items: center; }
   .screen.active { display: flex; }
+
+  h1 { margin: 0 0 8px; font-size: 2.4rem; text-align: center; }
+  p.rules { font-size: 1.1rem; margin: 0 0 24px; text-align: center; max-width: 520px; }
+  label { font-weight: 700; margin-bottom: 6px; }
 
   input[type=text] {
     width: 100%;
     max-width: 320px;
     font: inherit;
-    font-size: 1.4rem;
-    padding: 12px 16px;
-    border: 2px solid var(--line);
+    font-size: 1.3rem;
+    padding: 8px 10px;
+    border: 0;
     border-radius: 0;
-    background: var(--paper);
-    color: var(--ink);
+    background: #fff;
+    color: #000;
+    box-shadow: var(--sunken);
     text-align: center;
     margin-bottom: 20px;
   }
-  input[type=text]:focus { outline: 3px solid var(--blue); outline-offset: 2px; }
+  input[type=text]:focus { outline: 1px dotted #000; outline-offset: -6px; }
 
   button {
     font: inherit;
-    font-weight: 800;
-    letter-spacing: .06em;
-    border: 2px solid var(--line);
+    font-weight: 700;
+    letter-spacing: .04em;
+    border: 0;
     border-radius: 0;
     cursor: pointer;
-    color: #fff;
-    box-shadow: 4px 4px 0 var(--line);
-    transition: transform .06s, box-shadow .06s;
+    background: var(--face);
+    color: #000;
+    box-shadow: var(--raised);
   }
-  button:active:not(:disabled) { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--line); }
-  button:disabled { background: #c4c9d2 !important; color: #6b7280; box-shadow: none; cursor: not-allowed; }
-  .big { font-size: 1.8rem; padding: 14px 56px; background: var(--blue); }
-  #buyBtn, #sellBtn { flex: 1; font-size: 2rem; padding: 20px 0; }
+  button:active:not(:disabled) { box-shadow: var(--pressed); padding-top: calc(var(--py, 10px) + 1px); padding-left: calc(var(--px, 24px) + 1px); }
+  button:focus-visible { outline: 1px dotted #000; outline-offset: -6px; }
+  button:disabled { color: #808080; text-shadow: 1px 1px 0 #fff; cursor: not-allowed; }
+  .big { --py: 12px; --px: 40px; font-size: 1.4rem; padding: var(--py) var(--px); }
+  #buyBtn, #sellBtn { --py: 16px; --px: 0px; flex: 1; font-size: 1.8rem; padding: var(--py) 0; color: #fff; text-shadow: 1px 1px 0 #000; }
   #buyBtn { background: var(--green); }
   #sellBtn { background: var(--red); }
+  #buyBtn:disabled, #sellBtn:disabled { background: var(--face); color: #808080; text-shadow: 1px 1px 0 #fff; }
 
-  .hud { display: flex; justify-content: space-between; align-items: baseline; width: 100%; margin-bottom: 8px; }
-  #playerName { font-size: 1.4rem; font-weight: 700; overflow-wrap: anywhere; }
-  #timer { font-size: 2.4rem; font-variant-numeric: tabular-nums; font-weight: 800; color: var(--blue); }
-  #timer.low { color: var(--red); }
-  #price { font-size: 4.5rem; font-weight: 800; font-variant-numeric: tabular-nums; margin: 4px 0; }
-  #price.up { color: var(--green); }
-  #price.down { color: var(--red); }
-  canvas { width: 100%; height: 220px; background: var(--paper); border: 2px solid var(--line); margin-bottom: 20px; }
-  .trade-row { display: flex; gap: 20px; width: 100%; margin-bottom: 20px; }
-  .locks { display: flex; gap: 32px; color: var(--muted); font-size: 1.1rem; min-height: 1.6em; }
-  .locks b { color: var(--ink); }
+  /* Black LED screens */
+  .led { background: var(--screen); box-shadow: var(--sunken); color: var(--led-up); text-align: center; }
+  .led .pos, .led .up { color: var(--led-up); }
+  .led .neg, .led .down { color: var(--led-down); }
 
-  #resultName { font-size: 1.6rem; color: var(--muted); margin-bottom: 4px; overflow-wrap: anywhere; text-align: center; }
-  #resultProfit { font-size: 5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
-  #resultMsg { font-size: 1.6rem; margin: 8px 0 32px; text-align: center; }
+  .led.field { background: var(--screen); color: var(--led-up); }
+  .hud { display: flex; justify-content: space-between; align-items: stretch; gap: 12px; width: 100%; margin-bottom: 12px; }
+  .field { background: #fff; box-shadow: var(--sunken); padding: 6px 12px; font-size: 1.15rem; font-weight: 700; overflow-wrap: anywhere; display: flex; align-items: center; }
+  #timerBox { padding: 4px 16px; min-width: 96px; justify-content: center; }
+  #timer { font-size: 2rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+  #timer.low { color: var(--led-down); }
+  #priceBox { width: 100%; padding: 6px 12px; margin-bottom: 12px; }
+  #priceBox small { display: block; color: #9a9a9a; font-size: .75rem; letter-spacing: .2em; }
+  #price { font-size: 3.2rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  canvas { width: 100%; height: 190px; background: var(--screen); box-shadow: var(--sunken); margin-bottom: 12px; display: block; }
+  .trade-row { display: flex; gap: 16px; width: 100%; margin-bottom: 10px; }
+  .locks { display: flex; gap: 8px; width: 100%; }
+  .locks span { flex: 1; box-shadow: var(--sunken); padding: 4px 10px; font-size: 1rem; min-height: 1.9em; }
 
+  #resultName { font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; overflow-wrap: anywhere; text-align: center; }
+  #resultBox { width: 100%; padding: 12px; margin-bottom: 12px; }
+  #resultProfit { font-size: 4.2rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  #resultMsg { font-size: 1.4rem; margin: 4px 0 24px; text-align: center; }
+
+  #boardWrap { background: #fff; box-shadow: var(--sunken); padding: 8px 12px; }
   ol { margin: 0; padding: 0; list-style: none; }
   li {
     display: flex; justify-content: space-between; gap: 12px;
-    padding: 8px 0; border-bottom: 1px solid #d3d7de;
-    font-size: 1.1rem;
+    padding: 6px 0; border-bottom: 1px dotted #808080;
+    font-size: 1.05rem;
   }
   li:last-child { border-bottom: 0; }
-  li .rank { color: var(--blue); font-weight: 800; width: 1.5em; }
+  li .rank { color: var(--navy); font-weight: 800; width: 1.5em; }
   li .who { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   li .val { font-variant-numeric: tabular-nums; font-weight: 700; }
-  li.empty { color: var(--muted); justify-content: center; }
+  li.empty { color: #808080; justify-content: center; }
   .pos { color: var(--green); }
   .neg { color: var(--red); }
 
   @media (max-width: 800px) {
-    .layout { flex-direction: column-reverse; padding: 16px; }
-    aside { width: 100%; align-self: stretch; }
+    header { grid-template-columns: auto 1fr; }
+    header .ctl { display: none; }
+    header h1.brand { font-size: 1.5rem; }
+    header img { height: 56px; }
+    .layout { flex-direction: column-reverse; padding: 12px; align-items: stretch; }
+    aside.win { width: 100%; }
   }
 </style>
 </head>
 <body>
 <header>
-  <img src="placeholder.png" alt="Logo">
-  <span>ECSS Investment Club</span>
+  <img src="img.png" alt="St. Edmund Campion Investment Club logo">
+  <h1 class="brand">ECSS Investment Club</h1>
+  <div class="ctl" aria-hidden="true"><span>_</span><span>&#9633;</span><span>&#10005;</span></div>
 </header>
 <div class="layout">
 <main>
-  <!-- Start screen -->
-  <section id="startScreen" class="screen active">
-    <h1>Buy Low, Sell High</h1>
-    <p class="rules">You have 30 seconds. Press BUY once, then SELL once. Make the biggest profit.</p>
-    <input id="nameInput" name="nick" type="text" maxlength="12" placeholder="Nickname" autocomplete="off" autocapitalize="words" spellcheck="false" autofocus>
-    <button id="startBtn" class="big" disabled>START</button>
-  </section>
+  <div class="win">
+    <div class="titlebar"><span>Trading Terminal</span><div class="ctl" aria-hidden="true"><span>_</span><span>&#9633;</span><span>&#10005;</span></div></div>
+    <div class="win-body">
+      <!-- Start screen -->
+      <section id="startScreen" class="screen active">
+        <h1>Buy Low, Sell High</h1>
+        <p class="rules">You have 30 seconds. Press BUY once, then SELL once. Make the biggest profit.</p>
+        <label for="nameInput">Trader name:</label>
+        <input id="nameInput" name="nick" type="text" maxlength="12" placeholder="Nickname" autocomplete="off" autocapitalize="words" spellcheck="false" autofocus>
+        <button id="startBtn" class="big" disabled>START</button>
+      </section>
 
-  <!-- Game screen -->
-  <section id="gameScreen" class="screen">
-    <div class="hud">
-      <div id="playerName"></div>
-      <div id="timer">30</div>
-    </div>
-    <div id="price">100.00</div>
-    <canvas id="chart" width="640" height="220"></canvas>
-    <div class="trade-row">
-      <button id="buyBtn">BUY</button>
-      <button id="sellBtn" disabled>SELL</button>
-    </div>
-    <div class="locks">
-      <span>Bought at: <b id="buyLock">—</b></span>
-      <span>Sold at: <b id="sellLock">—</b></span>
-    </div>
-  </section>
+      <!-- Game screen -->
+      <section id="gameScreen" class="screen">
+        <div class="hud">
+          <div class="field" id="playerName"></div>
+          <div class="led field" id="timerBox"><div id="timer">30</div></div>
+        </div>
+        <div class="led" id="priceBox"><small>PRICE</small><div id="price">100.00</div></div>
+        <canvas id="chart" width="640" height="190"></canvas>
+        <div class="trade-row">
+          <button id="buyBtn">BUY</button>
+          <button id="sellBtn" disabled>SELL</button>
+        </div>
+        <div class="locks">
+          <span>Bought at: <b id="buyLock">—</b></span>
+          <span>Sold at: <b id="sellLock">—</b></span>
+        </div>
+      </section>
 
-  <!-- End screen -->
-  <section id="endScreen" class="screen">
-    <div id="resultName"></div>
-    <div id="resultProfit"></div>
-    <div id="resultMsg"></div>
-    <button id="nextBtn" class="big">NEXT PLAYER</button>
-  </section>
+      <!-- End screen -->
+      <section id="endScreen" class="screen">
+        <div id="resultName"></div>
+        <div class="led" id="resultBox"><div id="resultProfit"></div></div>
+        <div id="resultMsg"></div>
+        <button id="nextBtn" class="big">NEXT PLAYER</button>
+      </section>
+    </div>
+  </div>
 </main>
 
-<aside id="boardPanel">
-  <h2>Leaderboard</h2>
-  <ol id="board"></ol>
+<aside id="boardPanel" class="win">
+  <div class="titlebar"><span>Top Traders</span><div class="ctl" aria-hidden="true"><span>_</span><span>&#9633;</span><span>&#10005;</span></div></div>
+  <div class="win-body">
+    <div id="boardWrap"><ol id="board"></ol></div>
+  </div>
 </aside>
 </div>
 
@@ -251,9 +317,16 @@
     const x = i => pad + (i / (ROUND_MS / TICK_MS)) * (w - 2 * pad);
     const y = v => h - pad - ((v - min) / span) * (h - 2 * pad);
 
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(255,255,255,0.09)";
+    ctx.beginPath();
+    for (let i = 1; i < 4; i++) { ctx.moveTo(0, (h * i) / 4); ctx.lineTo(w, (h * i) / 4); }
+    for (let i = 1; i < 6; i++) { ctx.moveTo((w * i) / 6, 0); ctx.lineTo((w * i) / 6, h); }
+    ctx.stroke();
+
     ctx.lineWidth = 3;
     ctx.lineJoin = "round";
-    ctx.strokeStyle = "#1d4ed8";
+    ctx.strokeStyle = "#ffe94d";
     ctx.beginPath();
     pts.forEach((v, i) => (i ? ctx.lineTo(x(i), y(v)) : ctx.moveTo(x(i), y(v))));
     ctx.stroke();
@@ -265,9 +338,12 @@
       ctx.beginPath();
       ctx.arc(x(idx), y(price), 7, 0, Math.PI * 2);
       ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#fff";
+      ctx.stroke();
     };
-    if (game.buyPrice !== null) mark(game.buyPrice, "#15803d");
-    if (game.sellPrice !== null) mark(game.sellPrice, "#c81e1e");
+    if (game.buyPrice !== null) mark(game.buyPrice, "#3dff3d");
+    if (game.sellPrice !== null) mark(game.sellPrice, "#ff4d4d");
   }
 
   function startGame() {
