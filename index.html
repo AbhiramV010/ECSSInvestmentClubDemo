@@ -6,38 +6,48 @@
 <title>Buy Low, Sell High</title>
 <style>
   :root {
-    --bg: #0e1420;
-    --panel: #172033;
-    --panel-2: #1f2b45;
-    --text: #e8edf7;
-    --muted: #8b98b5;
-    --green: #2ecc71;
-    --red: #ff5c5c;
-    --accent: #4da3ff;
+    --bg: #f5f6f8;
+    --paper: #ffffff;
+    --ink: #14181f;
+    --muted: #5b6472;
+    --line: #14181f;
+    --blue: #1d4ed8;
+    --green: #15803d;
+    --red: #c81e1e;
   }
   * { box-sizing: border-box; }
   body {
     margin: 0;
     min-height: 100vh;
     background: var(--bg);
-    color: var(--text);
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
     display: flex;
-    gap: 24px;
-    padding: 24px;
+    flex-direction: column;
   }
+  header {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--blue);
+    color: #fff;
+    padding: 10px 24px;
+    border-bottom: 4px solid var(--ink);
+  }
+  header img { width: 44px; height: 44px; display: block; border: 2px solid #fff; }
+  header span { font-size: 1.2rem; font-weight: 700; letter-spacing: .02em; }
+  .layout { flex: 1; display: flex; gap: 24px; padding: 24px; }
   main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; }
   aside {
     width: 300px;
-    background: var(--panel);
-    border-radius: 16px;
-    padding: 24px;
+    background: var(--paper);
+    border: 2px solid var(--line);
+    border-top: 8px solid var(--blue);
+    padding: 20px;
     align-self: flex-start;
     display: none;
   }
   aside.open { display: block; }
   h1 { margin: 0 0 8px; font-size: 3rem; text-align: center; }
-  h2 { margin: 0 0 16px; font-size: 1.3rem; }
+  h2 { margin: 0 0 16px; font-size: 1.2rem; text-transform: uppercase; letter-spacing: .08em; }
   p.rules { color: var(--muted); font-size: 1.15rem; margin: 0 0 32px; text-align: center; max-width: 520px; }
   .screen { display: none; width: 100%; max-width: 640px; flex-direction: column; align-items: center; }
   .screen.active { display: flex; }
@@ -45,78 +55,84 @@
   input[type=text] {
     width: 100%;
     max-width: 320px;
+    font: inherit;
     font-size: 1.4rem;
-    padding: 14px 16px;
-    border-radius: 12px;
-    border: 2px solid var(--panel-2);
-    background: var(--panel);
-    color: var(--text);
+    padding: 12px 16px;
+    border: 2px solid var(--line);
+    border-radius: 0;
+    background: var(--paper);
+    color: var(--ink);
     text-align: center;
     margin-bottom: 20px;
   }
-  input[type=text]:focus { outline: none; border-color: var(--accent); }
+  input[type=text]:focus { outline: 3px solid var(--blue); outline-offset: 2px; }
 
   button {
     font: inherit;
     font-weight: 800;
-    letter-spacing: .05em;
-    border: 0;
-    border-radius: 14px;
+    letter-spacing: .06em;
+    border: 2px solid var(--line);
+    border-radius: 0;
     cursor: pointer;
     color: #fff;
-    transition: transform .08s, opacity .15s;
+    box-shadow: 4px 4px 0 var(--line);
+    transition: transform .06s, box-shadow .06s;
   }
-  button:active:not(:disabled) { transform: scale(.97); }
-  button:disabled { opacity: .3; cursor: not-allowed; }
-  .big { font-size: 1.8rem; padding: 18px 56px; background: var(--accent); }
-  #buyBtn, #sellBtn { flex: 1; font-size: 2rem; padding: 22px 0; }
+  button:active:not(:disabled) { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--line); }
+  button:disabled { background: #c4c9d2 !important; color: #6b7280; box-shadow: none; cursor: not-allowed; }
+  .big { font-size: 1.8rem; padding: 14px 56px; background: var(--blue); }
+  #buyBtn, #sellBtn { flex: 1; font-size: 2rem; padding: 20px 0; }
   #buyBtn { background: var(--green); }
   #sellBtn { background: var(--red); }
 
   .hud { display: flex; justify-content: space-between; align-items: baseline; width: 100%; margin-bottom: 8px; }
   #playerName { font-size: 1.4rem; font-weight: 700; overflow-wrap: anywhere; }
-  #timer { font-size: 2.4rem; font-variant-numeric: tabular-nums; font-weight: 800; }
+  #timer { font-size: 2.4rem; font-variant-numeric: tabular-nums; font-weight: 800; color: var(--blue); }
   #timer.low { color: var(--red); }
   #price { font-size: 4.5rem; font-weight: 800; font-variant-numeric: tabular-nums; margin: 4px 0; }
   #price.up { color: var(--green); }
   #price.down { color: var(--red); }
-  canvas { width: 100%; height: 220px; background: var(--panel); border-radius: 16px; margin-bottom: 16px; }
-  .trade-row { display: flex; gap: 16px; width: 100%; margin-bottom: 16px; }
+  canvas { width: 100%; height: 220px; background: var(--paper); border: 2px solid var(--line); margin-bottom: 20px; }
+  .trade-row { display: flex; gap: 20px; width: 100%; margin-bottom: 20px; }
   .locks { display: flex; gap: 32px; color: var(--muted); font-size: 1.1rem; min-height: 1.6em; }
-  .locks b { color: var(--text); }
+  .locks b { color: var(--ink); }
 
   #resultName { font-size: 1.6rem; color: var(--muted); margin-bottom: 4px; overflow-wrap: anywhere; text-align: center; }
   #resultProfit { font-size: 5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
-  #resultProfit.pos { color: var(--green); }
-  #resultProfit.neg { color: var(--red); }
   #resultMsg { font-size: 1.6rem; margin: 8px 0 32px; text-align: center; }
 
   ol { margin: 0; padding: 0; list-style: none; }
   li {
     display: flex; justify-content: space-between; gap: 12px;
-    padding: 10px 12px; border-radius: 10px; background: var(--panel-2); margin-bottom: 8px;
+    padding: 8px 0; border-bottom: 1px solid #d3d7de;
     font-size: 1.1rem;
   }
-  li .rank { color: var(--muted); width: 1.5em; }
+  li:last-child { border-bottom: 0; }
+  li .rank { color: var(--blue); font-weight: 800; width: 1.5em; }
   li .who { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   li .val { font-variant-numeric: tabular-nums; font-weight: 700; }
-  li.empty { color: var(--muted); justify-content: center; background: transparent; }
+  li.empty { color: var(--muted); justify-content: center; }
   .pos { color: var(--green); }
   .neg { color: var(--red); }
 
   @media (max-width: 800px) {
-    body { flex-direction: column-reverse; }
+    .layout { flex-direction: column-reverse; padding: 16px; }
     aside { width: 100%; align-self: stretch; }
   }
 </style>
 </head>
 <body>
+<header>
+  <img src="placeholder.png" alt="Logo">
+  <span>ECSS Investment Club</span>
+</header>
+<div class="layout">
 <main>
   <!-- Start screen -->
   <section id="startScreen" class="screen active">
     <h1>Buy Low, Sell High</h1>
     <p class="rules">You have 30 seconds. Press BUY once, then SELL once. Make the biggest profit.</p>
-    <input id="nameInput" type="text" maxlength="12" placeholder="Your name" autocomplete="off" autofocus>
+    <input id="nameInput" name="nick" type="text" maxlength="12" placeholder="Nickname" autocomplete="off" autocapitalize="words" spellcheck="false" autofocus>
     <button id="startBtn" class="big" disabled>START</button>
   </section>
 
@@ -148,9 +164,10 @@
 </main>
 
 <aside id="boardPanel">
-  <h2>🏆 Leaderboard</h2>
+  <h2>Leaderboard</h2>
   <ol id="board"></ol>
 </aside>
+</div>
 
 <script>
 (() => {
@@ -236,7 +253,7 @@
 
     ctx.lineWidth = 3;
     ctx.lineJoin = "round";
-    ctx.strokeStyle = "#4da3ff";
+    ctx.strokeStyle = "#1d4ed8";
     ctx.beginPath();
     pts.forEach((v, i) => (i ? ctx.lineTo(x(i), y(v)) : ctx.moveTo(x(i), y(v))));
     ctx.stroke();
@@ -249,8 +266,8 @@
       ctx.arc(x(idx), y(price), 7, 0, Math.PI * 2);
       ctx.fill();
     };
-    if (game.buyPrice !== null) mark(game.buyPrice, "#2ecc71");
-    if (game.sellPrice !== null) mark(game.sellPrice, "#ff5c5c");
+    if (game.buyPrice !== null) mark(game.buyPrice, "#15803d");
+    if (game.sellPrice !== null) mark(game.sellPrice, "#c81e1e");
   }
 
   function startGame() {
@@ -357,6 +374,15 @@
     if (e.ctrlKey && e.shiftKey && e.key === "F12") {
       e.preventDefault();
       $("boardPanel").classList.toggle("open");
+    }
+  });
+
+  // Ask before reload/close while a round is running or scores exist. Browsers show their own
+  // generic wording, and only after the page has been clicked or typed in.
+  window.addEventListener("beforeunload", e => {
+    if (game || leaderboard.length) {
+      e.preventDefault();
+      e.returnValue = "";
     }
   });
 
