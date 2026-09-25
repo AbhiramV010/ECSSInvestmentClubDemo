@@ -92,6 +92,7 @@
   h1 { margin: 0 0 8px; font-size: 2.4rem; text-align: center; }
   p.rules { font-size: 1.1rem; margin: 0 0 24px; text-align: center; max-width: 520px; }
   label { font-weight: 700; margin-bottom: 6px; }
+  #playedMsg { color: var(--red); font-weight: 700; min-height: 1.4em; margin: 8px 0 0; }
 
   input[type=text] {
     width: 100%;
@@ -193,8 +194,9 @@
       <section id="startScreen" class="screen active">
         <h1>Buy Low, Sell High</h1>
         <p class="rules">You have 30 seconds. Press BUY once, then SELL once. Make the biggest profit.</p>
-        <label for="nameInput">Trader name:</label>
-        <input id="nameInput" name="nick" type="text" maxlength="12" placeholder="Nickname" autocomplete="off" autocapitalize="words" spellcheck="false" autofocus>
+        <label for="nameInput">Student number:</label>
+        <input id="nameInput" name="student-number" type="text" inputmode="numeric" pattern="[0-9]{9}" maxlength="9" placeholder="9-digit student number" autocomplete="off" spellcheck="false" autofocus>
+        <div id="playedMsg" role="alert"></div>
         <button id="startBtn" class="big" disabled>START</button>
       </section>
 
@@ -238,9 +240,11 @@
 <script>
 (() => {
   const ROUND_MS = 30000;
-  const TICK_MS = 100;
-  const START_PRICE = 100;
+  const TICK_MS = 200;
+  const START_PRICE = 750;
+  const MIN_PRICE = 500, MAX_PRICE = 1000;
   const STORAGE_KEY = "ecss-leaderboard";
+  const PLAYED_KEY = "ecss-played-ids";
 
   const $ = id => document.getElementById(id);
   const screens = { start: $("startScreen"), game: $("gameScreen"), end: $("endScreen") };
@@ -250,8 +254,20 @@
   const canvas = $("chart"), ctx = canvas.getContext("2d");
 
   let leaderboard = load();   // [{name, profit}], sorted desc, max 5
+  let played = loadPlayed();  // every student number that has started a round (not capped like the board)
   let game = null;            // active round state
   let intervalId = null;
+
+  function loadPlayed() {
+    try {
+      const data = JSON.parse(localStorage.getItem(PLAYED_KEY));
+      if (Array.isArray(data)) return new Set(data.filter(s => typeof s === "string"));
+    } catch (e) {}
+    return new Set();
+  }
+  function savePlayed() {
+    try { localStorage.setItem(PLAYED_KEY, JSON.stringify([...played])); } catch (e) {}
+  }
 
   function load() {
     try {
@@ -264,6 +280,7 @@
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(leaderboard)); } catch (e) {}
   }
 
+  const isValidId = s => /^\d{9}$/.test(s);
   const fmt = n => n.toFixed(2);
   const fmtProfit = n => (n > 0 ? "+" : n < 0 ? "−" : "") + "$" + fmt(Math.abs(n));
 
@@ -305,8 +322,9 @@
   function nextPrice(p) {
     // random walk with slight mean reversion so it stays in a playable range
     const drift = (START_PRICE - p) * 0.004;
-    const shock = (Math.random() - 0.5) * 3.2;
-    return Math.max(1, p + drift + shock);
+    // slight upward bias (0.48 vs 0.5) so winning trades are a bit more likely
+    const shock = (Math.random() - 0.48) * 30;
+    return Math.min(MAX_PRICE, Math.max(MIN_PRICE, p + drift + shock));
   }
 
   function drawChart() {
@@ -348,7 +366,14 @@
 
   function startGame() {
     const name = nameInput.value.trim();
-    if (!name) return;
+    if (!isValidId(name)) return;
+    if (played.has(name)) {
+      $("playedMsg").textContent = "You've already played!";
+      return;
+    }
+    // Recorded at start so reloading mid-round can't buy a second attempt
+    played.add(name);
+    savePlayed();
     game = {
       name,
       price: START_PRICE,
@@ -433,12 +458,17 @@
 
   function nextPlayer() {
     nameInput.value = "";
+    $("playedMsg").textContent = "";
     startBtn.disabled = true;
     show("start");
     nameInput.focus();
   }
 
-  nameInput.addEventListener("input", () => { startBtn.disabled = !nameInput.value.trim(); });
+  nameInput.addEventListener("input", () => {
+    nameInput.value = nameInput.value.replace(/\D/g, "").slice(0, 9);
+    startBtn.disabled = !isValidId(nameInput.value);
+    $("playedMsg").textContent = "";
+  });
   nameInput.addEventListener("keydown", e => { if (e.key === "Enter") startGame(); });
   startBtn.addEventListener("click", startGame);
   buyBtn.addEventListener("click", buy);
