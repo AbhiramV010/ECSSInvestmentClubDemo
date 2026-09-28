@@ -29,6 +29,7 @@
     --sunken: inset -1px -1px #fff, inset 1px 1px #808080, inset -2px -2px #dfdfdf, inset 2px 2px #000;
   }
   * { box-sizing: border-box; }
+  html { touch-action: none; }
   body {
     margin: 0;
     min-height: 100vh;
@@ -480,7 +481,7 @@
     const profit = traded ? Math.round((game.sellPrice - game.buyPrice) * 100) / 100 : 0;
 
     let msg;
-    if (!traded) msg = "No trade. Playing it safe!";
+    if (!traded) msg = "No trade, so no leaderboard spot";
     else if (profit > 0) msg = "Nice trade!";
     else if (profit < 0) msg = "Ouch, you bought the top";
     else msg = "Break even";
@@ -491,7 +492,7 @@
     pe.className = profit > 0 ? "pos" : profit < 0 ? "neg" : "";
     $("resultMsg").textContent = msg;
 
-    addScore(game.name, profit);
+    if (traded) addScore(game.name, profit);
     game = null;
     // Brief pause so the player sees the locked sell price before the result appears
     endTimeoutId = setTimeout(() => { if (!game) show("end"); $("nextBtn").focus(); }, 600);
@@ -534,6 +535,13 @@
   $("nextBtn").addEventListener("click", nextPlayer);
   $("resetBtn").addEventListener("click", resetAll);
 
+  // Touch input is ignored entirely so only the mouse and keyboard can play
+  const blockTouch = e => { e.preventDefault(); e.stopPropagation(); };
+  for (const type of ["touchstart", "touchmove", "touchend"]) {
+    document.addEventListener(type, blockTouch, { capture: true, passive: false });
+  }
+  document.addEventListener("click", e => { if (e.pointerType === "touch") blockTouch(e); }, true);
+
   // Ctrl+Shift+F12 (with Fn on laptops) toggles the leaderboard panel
   document.addEventListener("keydown", e => {
     if (e.ctrlKey && e.shiftKey && e.key === "F12") {
@@ -550,6 +558,22 @@
       e.returnValue = "";
     }
   });
+
+  // Keep the screen (and so the PC) awake the whole time the page is showing. The browser
+  // drops the lock when the tab is hidden, so it is requested again whenever it comes back.
+  let wakeLock = null;
+  async function keepAwake() {
+    if (wakeLock || document.visibilityState !== "visible" || !("wakeLock" in navigator)) return;
+    try {
+      wakeLock = await navigator.wakeLock.request("screen");
+      wakeLock.addEventListener("release", () => { wakeLock = null; });
+    } catch (e) {}
+  }
+  document.addEventListener("visibilitychange", keepAwake);
+  // Retry on input in case the first request was refused before the page was interacted with
+  document.addEventListener("pointerdown", keepAwake);
+  document.addEventListener("keydown", keepAwake);
+  keepAwake();
 
   renderBoard();
   nameInput.focus();
