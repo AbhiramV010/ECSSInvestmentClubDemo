@@ -60,13 +60,15 @@
     text-shadow: 2px 2px 0 #000;
   }
   .ctl { display: flex; gap: 2px; justify-self: end; }
-  .ctl span {
-    width: 26px; height: 24px;
+  .ctl span, .ctl button {
+    width: 26px; height: 24px; padding: 0;
     display: grid; place-items: center;
     background: var(--face); color: #000;
     box-shadow: var(--raised);
     font-size: 14px; font-weight: 800; line-height: 1;
   }
+  .ctl .close { background: var(--red); color: #fff; }
+  .ctl button { --py: 0px; --px: 0px; letter-spacing: 0; }
 
   .layout { flex: 1; display: flex; gap: 24px; padding: 16px 24px; align-items: flex-start; }
   main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; align-self: stretch; }
@@ -84,7 +86,7 @@
     font-weight: 700;
     font-size: .95rem;
   }
-  .titlebar .ctl span { width: 20px; height: 18px; font-size: 11px; }
+  .titlebar .ctl span, .titlebar .ctl button { width: 20px; height: 18px; font-size: 11px; }
   .win-body { padding: 12px 16px; }
   .screen { display: none; flex-direction: column; align-items: center; }
   .screen.active { display: flex; }
@@ -195,12 +197,12 @@
 <header>
   <img src="img.png" alt="St. Edmund Campion Investment Club logo">
   <h1 class="brand">ECSS Investment Club</h1>
-  <div class="ctl" aria-hidden="true"><span>_</span><span>&#9633;</span><span>&#10005;</span></div>
+  <div class="ctl" aria-hidden="true"><span>_</span><span>&#9633;</span><span class="close">&#10005;</span></div>
 </header>
 <div class="layout">
 <main>
   <div class="win">
-    <div class="titlebar"><span>Trading Terminal</span><div class="ctl" aria-hidden="true"><span>_</span><span>&#9633;</span><span>&#10005;</span></div></div>
+    <div class="titlebar"><span>Trading Terminal</span><div class="ctl" aria-hidden="true"><span>_</span><span>&#9633;</span><span class="close">&#10005;</span></div></div>
     <div class="win-body">
       <!-- Start screen -->
       <section id="startScreen" class="screen active">
@@ -243,7 +245,7 @@
 </main>
 
 <aside id="boardPanel" class="win">
-  <div class="titlebar"><span>Top Traders</span><div class="ctl" aria-hidden="true"><span>_</span><span>&#9633;</span><span>&#10005;</span></div></div>
+  <div class="titlebar"><span>Top Traders</span><div class="ctl"><span aria-hidden="true">_</span><span aria-hidden="true">&#9633;</span><button id="resetBtn" class="close" type="button" title="Reset all: clear the leaderboard and let every student number play again" aria-label="Reset all">&#10005;</button></div></div>
   <div class="win-body">
     <div id="boardWrap"><ol id="board"></ol></div>
   </div>
@@ -254,7 +256,7 @@
 (() => {
   const ROUND_MS = 30000;
   const COUNTDOWN_MS = 5000;
-  const TICK_MS = 200;
+  const TICK_MS = 250;
   const START_PRICE = 750;
   const MIN_PRICE = 500, MAX_PRICE = 1000;
   const STORAGE_KEY = "ecss-leaderboard";
@@ -271,6 +273,7 @@
   let played = loadPlayed();  // every student number that has started a round (not capped like the board)
   let game = null;            // active round state
   let intervalId = null;
+  let endTimeoutId = null;
 
   function loadPlayed() {
     try {
@@ -491,7 +494,7 @@
     addScore(game.name, profit);
     game = null;
     // Brief pause so the player sees the locked sell price before the result appears
-    setTimeout(() => { if (!game) show("end"); $("nextBtn").focus(); }, 600);
+    endTimeoutId = setTimeout(() => { if (!game) show("end"); $("nextBtn").focus(); }, 600);
   }
 
   function nextPlayer() {
@@ -500,6 +503,23 @@
     startBtn.disabled = true;
     show("start");
     nameInput.focus();
+  }
+
+  function resetAll() {
+    if (!confirm("Reset everything? This clears the leaderboard and lets every student number play again.")) return;
+    clearInterval(intervalId);
+    clearTimeout(endTimeoutId);
+    intervalId = null;
+    game = null;
+    $("countdown").classList.remove("active");
+    leaderboard = [];
+    played = new Set();
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(PLAYED_KEY);
+    } catch (e) {}
+    renderBoard();
+    nextPlayer();
   }
 
   nameInput.addEventListener("input", () => {
@@ -512,6 +532,7 @@
   buyBtn.addEventListener("click", buy);
   sellBtn.addEventListener("click", sell);
   $("nextBtn").addEventListener("click", nextPlayer);
+  $("resetBtn").addEventListener("click", resetAll);
 
   // Ctrl+Shift+F12 (with Fn on laptops) toggles the leaderboard panel
   document.addEventListener("keydown", e => {
