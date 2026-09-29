@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>One-Minute Pitch | STEAM IC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --wood:#7a4a2a;
+  --lamp:rgba(255,226,160,.22);
+  --paper:#fbfaf5;
+  --ink:#1e2740;
+  --legal:#f8ee9f;
+  --legal-line:#9fc3dd;
+  --margin:#d9534f;
+  --manila:#e0bf78;
+  --manila-lo:#c9a35a;
+  --manila-edge:#a8843f;
+  --brass-hi:#efd998;
+  --brass:#b8923f;
+  --brass-lo:#6f521b;
+  --stamp:#b3261e;
+  --tape:#1d4f91;
+  --face:#f4f1e8;
+  --board:#9a6b3c;
+  --shadow:rgba(20,8,0,.45);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --wood:#4a2b17; --lamp:rgba(255,210,140,.12);
+    --paper:#e6e4dc; --legal:#e4d98f; --face:#e2ded3; --board:#7a522c;
+    --shadow:rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --wood:#4a2b17; --lamp:rgba(255,210,140,.12);
+  --paper:#e6e4dc; --legal:#e4d98f; --face:#e2ded3; --board:#7a522c;
+  --shadow:rgba(0,0,0,.6);
+}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{
+  margin:0;min-height:100%;
+  font-family:"Courier Prime","Courier New",Courier,monospace;
+  color:var(--ink);
+  background-color:var(--wood);
+  background-image:
+    radial-gradient(ellipse 80% 55% at 50% 0%,var(--lamp),transparent 70%),
+    radial-gradient(ellipse at 50% 120%,rgba(0,0,0,.35),transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='700'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.003 0.11' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0.18 0 0 0 0 0.09 0 0 0 0 0.03 0 0 0 0.6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+.desk{max-width:1060px;margin:0 auto;padding:28px 18px 56px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid #ffd35a;outline-offset:3px}
+
+/* brass plaque */
+.plaque{
+  position:relative;display:inline-block;padding:14px 38px 12px;border-radius:6px;
+  background:linear-gradient(160deg,var(--brass-hi),var(--brass) 45%,var(--brass-lo) 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -2px 3px rgba(0,0,0,.3),0 6px 14px var(--shadow);
+}
+.plaque::before,.plaque::after{
+  content:"";position:absolute;top:50%;width:10px;height:10px;margin-top:-5px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#fff6d2,#8a6a2a 70%);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.35);
+}
+.plaque::before{left:12px}.plaque::after{right:12px}
+.plaque h1{margin:0;font-size:clamp(1.4rem,3.2vw,2rem);font-weight:700;color:#4d370e;text-shadow:0 1px 0 rgba(255,245,200,.7)}
+.plaque p{margin:2px 0 0;font-size:.85rem;color:#5a4214;text-shadow:0 1px 0 rgba(255,245,200,.6)}
+
+.top{display:flex;flex-wrap:wrap;gap:26px;align-items:flex-start;justify-content:space-between;margin-bottom:34px}
+
+.sticky{
+  width:min(300px,100%);padding:16px 18px 20px;background:#fbe56a;
+  font-family:Kalam,"Comic Sans MS",cursive;font-size:1.05rem;line-height:1.4;color:#3a2f0b;
+  transform:rotate(2deg);box-shadow:0 12px 14px -8px var(--shadow),inset 0 -18px 20px -18px rgba(0,0,0,.25);
+}
+.sticky p{margin:0}
+
+/* Dymo label */
+.label-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:30px}
+.label-row .pencil{font-family:Kalam,cursive;font-size:1.2rem;color:#f3e3c4;transform:rotate(-4deg)}
+.tape{
+  position:relative;background:var(--tape);border-radius:3px;padding:4px 10px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25),inset 0 -2px 0 rgba(0,0,0,.35),0 4px 8px var(--shadow);
+  background-image:linear-gradient(180deg,rgba(255,255,255,.12),transparent 40%,rgba(0,0,0,.18));
+}
+.tape input{
+  width:min(340px,70vw);border:0;background:transparent;outline:none;
+  font:700 1.25rem/1.6 "Courier Prime",monospace;letter-spacing:.14em;text-transform:uppercase;color:#f4f7ff;
+  text-shadow:0 1px 0 rgba(0,0,0,.55),0 -1px 0 rgba(255,255,255,.25);
+}
+.tape input::placeholder{color:rgba(230,238,255,.55)}
+.tape:focus-within{outline:3px solid #ffd35a;outline-offset:3px}
+.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+
+/* folders */
+.folders{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.folder{
+  position:relative;border:0;cursor:pointer;text-align:left;
+  height:200px;margin-top:26px;padding:22px 16px 16px;border-radius:3px 6px 6px 6px;
+  background:linear-gradient(180deg,var(--manila),var(--manila-lo));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 3px 0 var(--manila-edge),0 14px 20px -6px var(--shadow);
+  transition:transform .15s ease,box-shadow .15s ease;
+}
+.folder::before{
+  content:"";position:absolute;top:-24px;left:0;width:64%;height:26px;border-radius:7px 7px 0 0;
+  background:var(--manila);box-shadow:inset 0 1px 0 rgba(255,255,255,.45);
+}
+.folder .tab{position:absolute;top:-22px;left:14px;font-family:Kalam,cursive;font-weight:700;font-size:1.05rem;color:#3a2a10;white-space:nowrap}
+.folder .dot{display:block;width:26px;height:26px;border-radius:50%;margin-bottom:14px;box-shadow:inset 0 -2px 3px rgba(0,0,0,.3),0 1px 1px rgba(0,0,0,.25)}
+.folder .teaser{font-family:Kalam,cursive;font-size:1.1rem;line-height:1.3;color:#3a2a10}
+.folder:hover{transform:translateY(-5px) rotate(-.6deg);box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 3px 0 var(--manila-edge),0 22px 26px -8px var(--shadow)}
+
+/* stage */
+.stage{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:30px;align-items:start}
+.back{
+  border:0;background:none;cursor:pointer;padding:4px 0;margin-bottom:18px;
+  font-family:Kalam,cursive;font-size:1.15rem;color:#f3e3c4;text-decoration:underline;text-underline-offset:4px
+}
+.clipboard{
+  position:relative;padding:44px 16px 18px;border-radius:12px;background:var(--board);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.12 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  box-shadow:inset 0 0 0 2px rgba(0,0,0,.15),0 18px 26px -8px var(--shadow);
+}
+.clip{
+  position:absolute;top:-14px;left:50%;width:150px;height:52px;margin-left:-75px;border-radius:10px 10px 6px 6px;
+  background:linear-gradient(180deg,#f1f3f5,#9aa3ab 55%,#6c757d);
+  box-shadow:inset 0 1px 0 #fff,0 4px 6px rgba(0,0,0,.4);z-index:2;
+}
+.clip::after{content:"";position:absolute;left:50%;top:10px;width:44px;height:14px;margin-left:-22px;border-radius:8px;background:var(--board);box-shadow:inset 0 2px 3px rgba(0,0,0,.5)}
+.sheet{background:var(--paper);padding:26px 24px 20px;box-shadow:0 1px 2px rgba(0,0,0,.25);font-size:.98rem;line-height:1.65}
+.sheet .head{display:flex;justify-content:space-between;gap:10px;border-bottom:2px solid var(--ink);padding-bottom:6px;margin-bottom:10px}
+.sheet .head b{font-size:1.2rem}
+.sheet .head span{font-size:.85rem;opacity:.75;align-self:flex-end}
+.brief h3{font-size:1rem;margin:16px 0 4px;text-decoration:underline;text-underline-offset:3px}
+.brief p{margin:0 0 8px}
+.brief ul{margin:0;padding-left:1.2em}
+.brief li{margin-bottom:6px}
+.source{margin-top:16px;font-size:.78rem;opacity:.7}
+
+.tools{display:flex;flex-direction:column;align-items:center;gap:18px}
+.watch{position:relative;width:min(230px,70vw)}
+.watch svg{display:block;width:100%;height:auto;filter:drop-shadow(0 12px 12px var(--shadow))}
+.readout{
+  margin-top:6px;text-align:center;font:700 1.3rem "Courier Prime",monospace;color:#f3e3c4;
+  text-shadow:0 1px 2px rgba(0,0,0,.6)
+}
+
+.btn{
+  border:0;cursor:pointer;border-radius:10px;padding:12px 26px;font-weight:700;font-size:1.05rem;
+  transition:transform .06s ease,box-shadow .06s ease;
+}
+.btn:active:not(:disabled){transform:translateY(4px)}
+.btn:disabled{cursor:not-allowed;filter:saturate(.35) brightness(.9);opacity:.75}
+.btn-red{
+  color:#fff4f0;background:linear-gradient(180deg,#e2574c,#b3261e);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 5px 0 #6e140f,0 10px 14px var(--shadow);
+  text-shadow:0 -1px 0 rgba(0,0,0,.35)
+}
+.btn-red:active:not(:disabled){box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 1px 0 #6e140f,0 4px 6px var(--shadow)}
+.btn-navy{
+  color:#eef3ff;background:linear-gradient(180deg,#3f6fb6,#1d4f91);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 5px 0 #0e2a52,0 10px 14px var(--shadow);
+  text-shadow:0 -1px 0 rgba(0,0,0,.35)
+}
+.btn-navy:active:not(:disabled){box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 1px 0 #0e2a52,0 4px 6px var(--shadow)}
+
+.pad{position:relative;width:100%;box-shadow:0 16px 22px -8px var(--shadow)}
+.pad-top{height:30px;background:linear-gradient(180deg,#8b2d23,#6b1f18);border-radius:4px 4px 0 0;box-shadow:inset 0 -3px 4px rgba(0,0,0,.35)}
+.pad textarea{
+  display:block;width:100%;min-height:260px;resize:vertical;border:0;outline:none;
+  padding:6px 14px 16px 58px;margin:0;
+  font:400 1.25rem/32px Kalam,"Comic Sans MS",cursive;color:#1b2c6b;
+  background-color:var(--legal);
+  background-image:
+    linear-gradient(90deg,transparent 44px,var(--margin) 44px,var(--margin) 46px,transparent 46px),
+    repeating-linear-gradient(180deg,transparent 0 31px,var(--legal-line) 31px 32px);
+  background-attachment:local;
+}
+.pad textarea:focus-visible{box-shadow:inset 0 0 0 3px #ffd35a}
+.pad textarea:read-only{cursor:default}
+.stamp{
+  position:absolute;right:18px;bottom:26px;padding:6px 16px;border:5px double var(--stamp);border-radius:8px;
+  color:var(--stamp);font:700 2rem/1.1 "Courier Prime",monospace;letter-spacing:.08em;text-align:center;
+  transform:rotate(-11deg);mix-blend-mode:multiply;opacity:.88;pointer-events:none;
+  animation:thump .35s cubic-bezier(.2,1.6,.4,1) both;
+}
+.stamp small{display:block;font-size:.8rem;letter-spacing:.12em}
+@keyframes thump{from{transform:rotate(-11deg) scale(2.2);opacity:0}to{transform:rotate(-11deg) scale(1);opacity:.88}}
+.status{min-height:1.6em;font-family:Kalam,cursive;font-size:1.15rem;color:#f3e3c4;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.6);margin:0}
+.row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+[hidden]{display:none!important}
+
+@media (max-width:860px){
+  .folders{grid-template-columns:repeat(2,1fr)}
+  .stage{grid-template-columns:1fr}
+}
+@media (max-width:420px){
+  .folders{grid-template-columns:1fr}
+  .folder{height:160px}
+}
+@media (prefers-reduced-motion:reduce){
+  .shake,.stamp{animation:none}
+  .folder,.btn{transition:none}
+}
+</style>
+</head>
+<body>
+<main class="desk">
+
+  <section id="desk">
+    <div class="top">
+      <div class="plaque">
+        <h1>One-Minute Pitch</h1>
+        <p>STEAM IC practice round, ICAC 2027 prompts</p>
+      </div>
+      <div class="sticky"><p>Put your name on the label and pick a folder. Read the brief, then start the clock. You get 60 seconds to pitch a fix.</p></div>
+    </div>
+
+    <div class="label-row">
+      <span class="pencil">Your name:</span>
+      <div class="tape" id="tape">
+        <input id="name" type="text" maxlength="28" autocomplete="off" placeholder="Type your name" aria-label="Your name">
+      </div>
+    </div>
+    <p class="status" id="deskStatus" aria-live="polite" style="text-align:left"></p>
+
+    <div class="folders" id="folders"></div>
+  </section>
+
+  <section id="stageView" hidden>
+    <button class="back" id="back" type="button">Back to the folders</button>
+    <div class="stage">
+      <div class="clipboard">
+        <div class="clip" aria-hidden="true"></div>
+        <article class="sheet">
+          <div class="head"><b id="briefTitle"></b><span id="briefWho"></span></div>
+          <div class="brief" id="brief"></div>
+          <p class="source">Summarized from the ICAC 2027 prompts on steaminnovationchallenge.org</p>
+        </article>
+      </div>
+
+      <div class="tools">
+        <div class="watch">
+          <svg viewBox="0 0 220 240" aria-hidden="true">
+            <defs>
+              <linearGradient id="brass" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#f3dea0"/><stop offset=".45" stop-color="#b8923f"/><stop offset="1" stop-color="#5d4415"/>
+              </linearGradient>
+              <radialGradient id="glass" cx=".35" cy=".3" r=".8">
+                <stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <rect x="96" y="2" width="28" height="18" rx="4" fill="url(#brass)"/>
+            <rect x="103" y="18" width="14" height="12" fill="url(#brass)"/>
+            <circle cx="110" cy="130" r="104" fill="url(#brass)"/>
+            <circle cx="110" cy="130" r="92" fill="#3b2a0c" opacity=".35"/>
+            <circle cx="110" cy="130" r="89" fill="var(--face)"/>
+            <path id="wedge" fill="#b3261e" opacity=".18"/>
+            <g id="ticks" stroke="#1e2740" stroke-linecap="round"></g>
+            <g id="nums" font-family="Courier Prime, monospace" font-weight="700" font-size="12" fill="#1e2740" text-anchor="middle"></g>
+            <g id="hand">
+              <line x1="110" y1="148" x2="110" y2="52" stroke="#b3261e" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="110" cy="130" r="7" fill="#1e2740"/>
+              <circle cx="110" cy="130" r="2.5" fill="#efd998"/>
+            </g>
+            <circle cx="110" cy="130" r="89" fill="url(#glass)"/>
+          </svg>
+          <div class="readout" id="readout">1:00</div>
+        </div>
+
+        <button class="btn btn-red" id="start" type="button">Start the clock</button>
+
+        <div class="pad">
+          <div class="pad-top" aria-hidden="true"></div>
+          <textarea id="answer" readonly aria-label="Your solution" placeholder="What's your fix, and how does it work?"></textarea>
+          <div class="stamp" id="stamp" hidden></div>
+        </div>
+
+        <p class="status" id="status" aria-live="polite">Read the brief. Start the clock when you're ready.</p>
+        <div class="row">
+          <button class="btn btn-navy" id="submit" type="button" disabled>Hand it in</button>
+          <button class="btn btn-navy" id="again" type="button" hidden>Try another prompt</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+const PROMPTS = [
+  { id:"astronomy", name:"Astronomy", color:"#2f5fa8", teaser:"Orbital debris is crowding the sky", md:
+`### The problem
+Satellites, debris and dead spacecraft keep piling up in Earth's orbit. They move unpredictably, they get in the way of telescope observations, and they make orbital motion harder to model.
+
+### What to solve
+- A better **optical or radar sky survey** that can detect, track and classify debris more precisely.
+- **Prediction models or sensors** that forecast where debris is heading and flag collision risks.
+- A way to **manage orbit sustainably** as satellite constellations keep growing.` },
+  { id:"engineering", name:"Engineering", color:"#c0582b", teaser:"Toronto's infrastructure vs. extreme weather", md:
+`### The problem
+Climate change is hitting cities like Toronto with higher temperatures, heavier rain and more freeze-thaw cycles. A lot of the infrastructure is old and already under strain.
+
+### What to solve
+- A **modular, climate-resilient network** that can be retrofitted into existing systems and handle flooding, fast temperature swings and long-term material wear.
+- **Sensors and response plans** that catch structural stress, water getting in, thermal expansion and weather hazards in real time.
+- Materials, shape and load distribution that stay **light, affordable and compatible with sustainable transportation**.` },
+  { id:"life", name:"Life Sciences", color:"#3d8a4f", teaser:"Assistive tech for people with dementia", md:
+`### The problem
+More than 55 million people worldwide live with dementia. As it gets worse, daily life gets harder: finding their way around familiar places, remembering tasks, taking medication and spotting hazards. Many end up depending on a caregiver for basic routines.
+
+### What to solve
+- An **adaptive assistive device** that helps with cognitive, navigation and safety problems.
+- One system that combines **guidance, sensing and reminders**.
+- A design that stays **discreet, modular and easy to use** across different homes and stages of decline.` },
+  { id:"cs", name:"Computer Science", color:"#7a3f9e", teaser:"Large language models and their water use", md:
+`### The problem
+Large language models keep getting bigger, and so does their environmental footprint. Training and data-center cooling both use a lot of water.
+
+### What to solve
+- **Algorithms, scheduling or architectures** that cut water use during training and inference.
+- **Sensors and monitoring** that track heat load, cooling efficiency and outside conditions live.
+- A **framework that scales**, mixing software optimization, distributed computing and model efficiency, so water use drops without hurting performance.` }
+];
+
+const $ = id => document.getElementById(id);
+const esc = s => s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function md(src){
+  let html = "", list = false;
+  const inline = t => esc(t).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  for (const raw of src.split("\n")){
+    const line = raw.trim();
+    if (line.startsWith("- ")){ if(!list){html+="<ul>";list=true;} html += "<li>"+inline(line.slice(2))+"</li>"; continue; }
+    if (list){ html+="</ul>"; list=false; }
+    if (!line) continue;
+    if (line.startsWith("### ")) html += "<h3>"+inline(line.slice(4))+"</h3>";
+    else html += "<p>"+inline(line)+"</p>";
+  }
+  if (list) html += "</ul>";
+  return html;
+}
+
+/* folders */
+const folders = $("folders");
+PROMPTS.forEach(p => {
+  const b = document.createElement("button");
+  b.className = "folder"; b.type = "button";
+  b.innerHTML = `<span class="tab">${p.name}</span><span class="dot" style="background:${p.color}"></span><span class="teaser">${p.teaser}</span>`;
+  b.addEventListener("click", () => openPrompt(p));
+  folders.appendChild(b);
+});
+
+/* stopwatch face */
+const CX = 110, CY = 130, R = 89;
+const pt = (deg, r) => { const a = (deg - 90) * Math.PI / 180; return [CX + r * Math.cos(a), CY + r * Math.sin(a)]; };
+(function buildFace(){
+  let t = "", n = "";
+  for (let i = 0; i < 60; i++){
+    const long = i % 5 === 0, [x1,y1] = pt(i*6, R-4), [x2,y2] = pt(i*6, R-(long?14:8));
+    t += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke-width="${long?2.2:1}"/>`;
+    if (long){ const [x,y] = pt(i*6, R-25); n += `<text x="${x}" y="${y+4}">${i===0?60:i}</text>`; }
+  }
+  $("ticks").innerHTML = t; $("nums").innerHTML = n;
+})();
+function drawClock(elapsed){
+  const f = Math.min(elapsed / 60, 1), a = f * 360;
+  $("hand").setAttribute("transform", `rotate(${a} ${CX} ${CY})`);
+  const wedge = $("wedge");
+  if (f >= 1){ wedge.setAttribute("d",""); }
+  else {
+    const start = Math.max(a, 0.01), [sx,sy] = pt(start, R-2), [ex,ey] = pt(359.99, R-2);
+    wedge.setAttribute("d", `M${CX} ${CY} L${sx} ${sy} A${R-2} ${R-2} 0 ${360-start>180?1:0} 1 ${ex} ${ey} Z`);
+  }
+  const left = Math.ceil(60 - elapsed);
+  $("readout").textContent = `${Math.floor(Math.max(left,0)/60)}:${String(Math.max(left,0)%60).padStart(2,"0")}`;
+}
+
+/* sound */
+let ctx = null;
+function beep(freq, dur, vol){
+  if (!ctx) return;
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.frequency.value = freq; o.type = "square";
+  g.gain.setValueAtTime(vol, ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+  o.connect(g).connect(ctx.destination); o.start(); o.stop(ctx.currentTime + dur);
+}
+
+/* game state */
+let current = null, running = false, t0 = 0, raf = 0, lastSec = 60, done = false;
+const answer = $("answer"), status = $("status"), startBtn = $("start"), submitBtn = $("submit"), againBtn = $("again"), stamp = $("stamp");
+const who = () => $("name").value.trim();
+
+function openPrompt(p){
+  if (!who()){
+    const tape = $("tape");
+    tape.classList.remove("shake"); void tape.offsetWidth; tape.classList.add("shake");
+    $("deskStatus").textContent = "Put your name on the label first.";
+    $("name").focus();
+    return;
+  }
+  $("deskStatus").textContent = "";
+  current = p;
+  $("briefTitle").textContent = p.name;
+  $("briefWho").textContent = "Pitch by " + who();
+  $("brief").innerHTML = md(p.md);
+  reset();
+  $("desk").hidden = true; $("stageView").hidden = false;
+  window.scrollTo({top:0});
+  startBtn.focus();
+}
+function reset(){
+  cancelAnimationFrame(raf); running = false; done = false; lastSec = 60;
+  answer.value = ""; answer.readOnly = true;
+  stamp.hidden = true;
+  startBtn.hidden = false; startBtn.disabled = false; startBtn.textContent = "Start the clock";
+  submitBtn.hidden = false; submitBtn.disabled = true; submitBtn.textContent = "Hand it in";
+  againBtn.hidden = true;
+  status.textContent = "Read the brief. Start the clock when you're ready.";
+  drawClock(0);
+}
+function start(){
+  try { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); } catch(e){}
+  answer.value = ""; answer.readOnly = false; answer.focus();
+  startBtn.disabled = true; submitBtn.disabled = false;
+  status.textContent = "Clock's running. Write fast.";
+  running = true; lastSec = 60; t0 = performance.now();
+  beep(880, .12, .08);
+  raf = requestAnimationFrame(tick);
+}
+function tick(now){
+  if (!running) return;
+  const el = (now - t0) / 1000;
+  drawClock(el);
+  const left = Math.ceil(60 - el);
+  if (left !== lastSec){ lastSec = left; if (left <= 10 && left > 0) beep(1200, .05, .05); }
+  if (el >= 60){ timeUp(); return; }
+  raf = requestAnimationFrame(tick);
+}
+function stopClock(){ running = false; cancelAnimationFrame(raf); answer.readOnly = true; }
+function timeUp(){
+  stopClock(); drawClock(60);
+  [0, 180, 360].forEach(d => setTimeout(() => beep(660, .15, .09), d));
+  if (!answer.value.trim()){
+    status.textContent = "Time ran out before anything hit the pad. Restart the clock to try again.";
+    submitBtn.disabled = true;
+    startBtn.disabled = false; startBtn.textContent = "Restart the clock";
+  } else {
+    status.textContent = "Time. Pens down, then hand it in.";
+  }
+}
+function handIn(){
+  if (done) return;
+  if (!answer.value.trim()){ status.textContent = "Write something on the pad first."; answer.focus(); return; }
+  stopClock();
+  done = true;
+  startBtn.hidden = true;
+  submitBtn.disabled = true; submitBtn.textContent = "Filing…";
+  status.textContent = "";
+  setTimeout(() => {
+    const d = new Date().toLocaleDateString("en-CA", {month:"short", day:"numeric", year:"numeric"}).toUpperCase();
+    stamp.innerHTML = `RECEIVED<small>${esc(d)}</small>`;
+    stamp.hidden = false;
+    beep(140, .18, .15);
+    submitBtn.hidden = true; againBtn.hidden = false;
+    status.textContent = `Got it, ${who()}. Your pitch is filed under ${current.name}.`;
+    againBtn.focus();
+  }, 1100);
+}
+function toDesk(){
+  stopClock();
+  $("stageView").hidden = true; $("desk").hidden = false;
+  window.scrollTo({top:0});
+}
+
+startBtn.addEventListener("click", start);
+submitBtn.addEventListener("click", handIn);
+againBtn.addEventListener("click", toDesk);
+$("back").addEventListener("click", toDesk);
+$("name").addEventListener("keydown", e => { if (e.key === "Enter") folders.querySelector("button").focus(); });
+drawClock(0);
+</script>
+</body>
+</html>
